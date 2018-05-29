@@ -1,6 +1,6 @@
 # Recurrent Highway Networks
 
-https://arxiv.org/pdf/1607.03474.pdf
+***Link to original paper:*** https://arxiv.org/pdf/1607.03474.pdf
 
 ## Brief Summary
 
