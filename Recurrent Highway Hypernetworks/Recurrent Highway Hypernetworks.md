@@ -1,4 +1,4 @@
-# Recurrent Highway Networks
+# Recurrent Highway Hypernetworks
 
 ***Link to original paper:*** https://papers.nips.cc/paper/6919-language-modeling-with-recurrent-highway-hypernetworks.pdf
 
