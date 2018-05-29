@@ -62,7 +62,7 @@ The hypernetwork is much smaller than the main network by design, hence upscalin
 The model blueprint (taken from the paper poster):
 
 <p align="center">
-  <img style="width:300px; height: 500px;" src="assets/RHHN-blueprint.png"/>
+  <img width=400px height=600px src="assets/RHHN-blueprint.png"/>
 </p>
 
 ## Code
