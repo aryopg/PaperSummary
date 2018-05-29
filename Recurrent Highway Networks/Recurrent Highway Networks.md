@@ -1,5 +1,7 @@
 # Recurrent Highway Networks
 
+https://arxiv.org/pdf/1607.03474.pdf
+
 ## Brief Summary
 
 Recurrent Highway Networks (RHNs) are the extension of Long Short Term Memory (LSTM) cells that allows step-to-step transition depths to be larger than one. Experiments confirmed the theoretical optimization advantages as well as improved performance on well known sequence modeling tasks.
