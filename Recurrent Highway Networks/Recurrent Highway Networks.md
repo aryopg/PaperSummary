@@ -143,30 +143,17 @@ class StateTransition (nn.Module):
 class RecurrentHighwayNetwork (nn.Module):
     def __init__(self, in_feat, out_feat, depth):
         super(RecurrentHighwayNetwork, self).__init__()
-        self.H = nn.ModuleList([
-	        			StateTransition(in_feat, out_feat) for i in range(depth)
-        			])
-        self.T = nn.ModuleList([
-	        			StateTransition(in_feat, out_feat) for i in range(depth)
-        			])
-        self.transform = []
-        self.gate = []
-        for i in range(num_layers):
-            transform = StateTransition(in_features, out_features)
-            gate = StateTransition(in_features, out_features)
-            setattr(self, 'transform%d' % i, transform)
-            setattr(self, 'gate%d' % i, gate)
-            self.transform.append(transform)
-            self.gate.append(gate)
+        self.H = nn.ModuleList([StateTransition(in_feat, out_feat) for i in range(depth)])
+        self.T = nn.ModuleList([StateTransition(in_feat, out_feat) for i in range(depth)])
         
     def forward(self, seq, s):
     	sOut = []
-		for x in seq:
-		    for h, t in zip(self.H, self.T):
-		        transform_gate = F.sigmoid(t(x, s))
-		        s = F.tanh(h(x, s)) * transform_gate + s * (1 - transform_gate)
-		        sOut += [s]
-		return s, sOut
+	for x in seq:
+	    for h, t in zip(self.H, self.T):
+		transform_gate = F.sigmoid(t(x, s))
+		s = F.tanh(h(x, s)) * transform_gate + s * (1 - transform_gate)
+		sOut += [s]
+	return s, sOut
 ```
 
 
