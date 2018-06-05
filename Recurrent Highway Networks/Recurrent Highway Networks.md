@@ -29,7 +29,7 @@ across both space and time which is difficult in practice
 
 ![alt text][DT-RNNs]
 
-- Stacking `d` RNN layers allows a maximum credit assignment path length (number of non-linear transformations) of `d + T − 1` between hidden states which are `T` time steps apart, while a recurrence depth of `d` enables a maximum path length of `d × T`.
+- Stacking $d$ RNN layers allows a maximum credit assignment path length (number of non-linear transformations) of $d + T − 1$ between hidden states which are $T$ time steps apart, while a recurrence depth of $d$ enables a maximum path length of $d × T$.
 - The latter allows greater power and efficiency by adding larger depths, but it also explains why such it is much more difficult to train compared to stacked RNNs
 
 ## Model
@@ -43,11 +43,11 @@ a network can be expanded using the chain rule:
 
 ![alt text][eq1]
 
-The Jacobian matrix ```∂y[t2]/∂y[t1]```, the key factor for the transport of the error from time step t2 to time step t1, is obtained by chaining the derivatives across all time steps:
+The Jacobian matrix $\frac{∂y[t_2]}{∂y[t_1]}$, the key factor for the transport of the error from time step $t_2$ to time step $t_1$, is obtained by chaining the derivatives across all time steps:
 
 ![alt text][eq2]
 
-the input and bias are omitted for simplicity. Let `A` be the temporal Jacobian matrix, `γ` be a maximal bound on `f'(Ry^[t−1])` and `σ_max` be the largest singular value of `R^T`. The norm of Jacobian satisfies:
+the input and bias are omitted for simplicity. Let $A$ be the temporal Jacobian matrix, $γ$ be a maximal bound on $f'(Ry^{[t−1]})$ and $σ_max$ be the largest singular value of $R^T$. The norm of Jacobian satisfies:
 
 ![alt text][eq3]
 
@@ -57,7 +57,7 @@ Which means, the condition for vanishing gradient:
   <img src="assets/eq3sup.png"/>
 </p>
 
-On the other hand, exploding gradient will emerge if the spectral radius `ρ` of `A` is greater than 1 since `||A|| ≥ ρ`. Note to self:
+On the other hand, exploding gradient will emerge if the spectral radius $ρ$ of $A$ is greater than 1 since $||A|| ≥ ρ$. Note to self:
 
 <p align="center">
   <img src="assets/spectral-radius-eq.png"/>
@@ -65,7 +65,7 @@ On the other hand, exploding gradient will emerge if the spectral radius `ρ` of
 
 #### Gershgorin Circle Theorem
 
-For any square matrix `A`:
+For any square matrix $A$:
 
 ![alt text][eq4]
 
@@ -73,11 +73,11 @@ Two example Gershgorin circles referring to differently initialized RNNs:
 
 ![alt text][fig-gct]
 
-GCT helps us understand the relationship between the entries of `R` and the possible locations of the eigenvalues of the Jacobian. Shifting the diagonal values `a_ii` shifts the possible locations of eigenvalues. Having large off-diagonal entries will allow for a large spread of eigenvalues. Small off-diagonal entries yield smaller radii and thus a more confined distribution of eigenvalues around the diagonal entries `a_ii`.
+GCT helps us understand the relationship between the entries of $R$ and the possible locations of the eigenvalues of the Jacobian. Shifting the diagonal values $a_ii$ shifts the possible locations of eigenvalues. Having large off-diagonal entries will allow for a large spread of eigenvalues. Small off-diagonal entries yield smaller radii and thus a more confined distribution of eigenvalues around the diagonal entries $a_ii$.
 
 ### Recurrent Highway Networks
 
-RHN layer with recurrence depth of `L` is defined as:
+RHN layer with recurrence depth of $L$ is defined as:
 
 ![alt text][eq6]
 
@@ -89,9 +89,9 @@ The computation graph can be illustrated as:
 
 ![alt text][RHN]
 
-From Equation 7-9, we can conclude that RHN with `L=1` is essentially a basic variant of LSTM like GRU. 
+From Equation 7-9, we can conclude that RHN with $L=1$ is essentially a basic variant of LSTM like GRU.
 
-By omitting the input and bias, the temporal jacobian `A` of RHN is given by:
+By omitting the input and bias, the temporal jacobian $A$ of RHN is given by:
 
 ![alt text][eq10]
 
@@ -103,7 +103,7 @@ and the spectrum will be:
 
 ![alt text][eq14]
 
-Equation 14 captures the influence of the gates on the eigenvalues of A. Compared to the situation for standard RNN, it can be seen that an RHN layer has more flexibility in adjusting the centers and radii of the Geršgorin circles. In
+Equation 14 captures the influence of the gates on the eigenvalues of $A$. Compared to the situation for standard RNN, it can be seen that an RHN layer has more flexibility in adjusting the centers and radii of the Geršgorin circles. In
 particular, two limiting cases can be noted. If all carry gates are fully open and transform gates are fully closed, we have:
 
 ![alt text][eq15]
@@ -112,14 +112,14 @@ Modelling Conclusion taken from Geršgorin circle theorem (GCT):
 
 - The gates in RHN layers provide a more versatile setup for dynamically remembering, forgetting and transforming information compared to standard RNNs.
 - Highly non-linear gating functions can facilitate learning through rapid and precise regulation of the network dynamics.
-- Depth is a widely used method to add expressive power to functions, this paper extends RHN layers to L > 1 using Highway layers in favor of simplicity and ease of training.
+- Depth is a widely used method to add expressive power to functions, this paper extends RHN layers to $L > 1$ using Highway layers in favor of simplicity and ease of training.
 - The analysis of the RHN layer’s flexibility in controlling its spectrum furthers our theoretical understanding of LSTM and Highway networks and their variants.
 
 ### Experiments
 
 Reading the paper is better, but the takeaway of the implementation is:
 
-- Carry gate was coupled to the transform gate by setting `C(·) = 1n − T(·)`. Similar to the suggestion from Highway Network and similar to GRU
+- Carry gate was coupled to the transform gate by setting $C(·) = 1n − T(·)$. Similar to the suggestion from Highway Network and similar to GRU
 - Bias the transform gates towards being closed at the start of training
 - Variational dropout (RHNs that use this reffered as Variational RHNs) == `recurrent_dropout` in keras
 - SGD optimizer
@@ -147,7 +147,7 @@ class RecurrentHighwayNetwork (nn.Module):
         super(RecurrentHighwayNetwork, self).__init__()
         self.H = nn.ModuleList([StateTransition(in_feat, out_feat) for i in range(depth)])
         self.T = nn.ModuleList([StateTransition(in_feat, out_feat) for i in range(depth)])
-        
+
     def forward(self, seq, s):
     	sOut = []
 	for x in seq:

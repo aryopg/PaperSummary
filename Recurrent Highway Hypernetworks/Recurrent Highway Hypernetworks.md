@@ -1,4 +1,4 @@
-# Recurrent Highway Hypernetworks
+# Character-Level Language Modeling with Recurrent Highway Hypernetworks
 
 ***Link to original paper:*** https://papers.nips.cc/paper/6919-language-modeling-with-recurrent-highway-hypernetworks.pdf
 
@@ -39,11 +39,11 @@ Multiple layer RHN cell notation would look as such:
 
 ### Hypernetwork
 
-Hypervector `z` as a linear upscaling projection applied to the outputs of a small recurrent network defined as such:
+Hypervector $z$ as a linear upscaling projection applied to the outputs of a small recurrent network defined as such:
 
 ![alt text][eq4]
 
-where, `W_p` is an upscaling projection from dimension `h` to `n` and `h<<n`. The hypervector will then be used to upscale the main recurrent network weights by:
+where, $W_p$ is an upscaling projection from dimension $h$ to $n$ and $h<<n$. The hypervector will then be used to upscale the main recurrent network weights by:
 
 ![alt text][eq5]
 
@@ -55,14 +55,14 @@ By combining the RHN and hypernetwork, RHNCellHyper looks as such:
 
 ![alt text][eq6]
 
-The hypernetwork is much smaller than the main network by design, hence upscaling occurs between the networks. The final architecture at each timestep for layer `l` can thus be written:
+The hypernetwork is much smaller than the main network by design, hence upscaling occurs between the networks. The final architecture at each timestep for layer $l$ can thus be written:
 
 ![alt text][eq7]
 
 The model blueprint (taken from the paper poster):
 
 <p align="center">
-  <img style="width:400px; height: 600px;" src="assets/RHHN-blueprint.png"/>
+  <img width=400px height=600px src="assets/RHHN-blueprint.png"/>
 </p>
 
 ## Code
@@ -81,7 +81,7 @@ from torch.autograd import Variable
 def highwayGate(Ws, s, gateDrop, trainable):
    h = int(Ws.size()[1]/2)
    hh, tt  = t.split(Ws, h, 1)
-   hh, tt = F.tanh(hh), F.sigmoid(tt) 
+   hh, tt = F.tanh(hh), F.sigmoid(tt)
    cc = 1 - tt
    tt = F.dropout(tt, p=gateDrop, training=trainable)
    return hh*tt + s*cc
@@ -105,7 +105,7 @@ class HyperLinear(Module):
         weight = self.weight
         z = torch.cat((z,z), 1)
         Wx = self._backend.Linear()(input, weight)*z
-        Wx += self.bias.expand_as(Wx) 
+        Wx += self.bias.expand_as(Wx)
         return Wx
 
     def __repr__(self):
@@ -126,7 +126,7 @@ class RHNCell(nn.Module):
       for l in range(self.depth):
          Ws = self.cell[l](s) if s is not 0 else 0
          if l == 0:
-            Ws += self.inp(x) 
+            Ws += self.inp(x)
          s = highwayGate(Ws, s, self.gateDrop, trainable)
          sOut += [s]
       return s, s, sOut
@@ -155,13 +155,13 @@ class HyperRHNCell(nn.Module):
       hHyper, hNetwork = h
       self.HyperCell = RHNCell(embedDim, hHyper, depth, gateDrop)
       self.RHNCell   = HyperCell(embedDim, hNetwork, depth, gateDrop)
-      self.upscaleProj = nn.ModuleList([nn.Linear(hHyper, hNetwork) 
+      self.upscaleProj = nn.ModuleList([nn.Linear(hHyper, hNetwork)
             for i in range(depth)])
 
    def initializeIfNone(self, s):
       if s is not 0: return s
       return (0, 0)
- 
+
    def forward(self, x, s, trainable):
       sHyper, sNetwork = self.initializeIfNone(s)
       _, _, sHyper = self.HyperCell(x, sHyper, trainable)
